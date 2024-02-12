@@ -17,3 +17,9 @@ image::documentation/screenshot.png[This is fyne - screen shot]
 * build with: `make all`
 * run with: `./bin/thisisfyne` after build
 
+== License
+
+This is supposed to be as free as possible under the https://creativecommons.org/public-domain/cc0/[Creative Commons Zero] (CC0).
+
+image::documentation/cc-zero.svg[CC0]
+
