@@ -1,6 +1,7 @@
 = This is fyne
 
-This is a project to try out and test the https://fyne.io/[*fyne* UI library] for golang.
+This is a project to try out and test the https://fyne.io/[*fyne* UI library] for golang. +
+(fyne version v2.4.3 in 2024-02-14)
 
 image::documentation/this_is_fyne.jpg[This is fyne]
 
@@ -17,7 +18,21 @@ If you are using another OS and not using Makefile you can most likely find out 
 
 * Install go (duh!)
 * Install fyne dependencies. +
-  Read the getting started docs at https://fyne.io/[fyne site].
+  Read the full getting started docs at the https://fyne.io/[fyne site]. +
+  Basically it is: +
+[source,bash]
+----
+    # ### Initialize modules for your project, if you have not already done so
+    $ cd myapp
+    $ go mod init MODULE_NAME
+
+    # ### Initialize modules for your project, if you have not already done so
+    $ go get fyne.io/fyne/v2@latest
+    $ go install fyne.io/fyne/v2/cmd/fyne@latest
+
+    # ### Finish by making sure all things are neat and tidy
+    $ go mod tidy
+----
 * Build with: `make all`
 * Run with: `./bin/thisisfyne` after build
 
