@@ -5,16 +5,16 @@ This is a project to try out and test the https://fyne.io/[*Fyne* UI library] fo
 
 image::documentation/this_is_fyne.jpg[This is fyne]
 
-== Screen shot
+== Screenshot
 
-.This is my fyne test application
-image::documentation/screenshot.png[This is fyne - screen shot]
+.This is a screenshot of my very fyne test application
+image::documentation/screenshot.png[This is fyne - screenshot]
 
 == Build and run application
 
-This project is developed using MacOS and Makefile as build tool.
+This project is developed using macOS and Makefile as build tool.
 
-If you are using another OS and not using Makefile you can most likely find out how to build the application by inspecting the `Makefile` and issue the commands manually.
+If you are using another OS and not using Makefile, you can most likely find out how to build the application by inspecting the `Makefile` and issue the commands manually.
 
 * Install go (duh!)
 * Install Fyne dependencies. +
