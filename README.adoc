@@ -11,15 +11,25 @@ image::documentation/screenshot.png[This is fyne - screen shot]
 
 == Build and run application
 
+This project is developed using MacOS and Makefile as build tool.
+
+If you are using another OS and not using Makefile you can most likely find out how to build the application by inspecting the `Makefile` and issue the commands manually.
+
 * Install go (duh!)
 * Install fyne dependencies. +
   Read the getting started docs at https://fyne.io/[fyne site].
-* build with: `make all`
-* run with: `./bin/thisisfyne` after build
+* Build with: `make all`
+* Run with: `./bin/thisisfyne` after build
+
+=== Build MacOS app
+
+You can use fyne to build a MacOS application (with application icon).
+
+* Build with `make macos-app`
+* Look for the application (using Finder) in `./bin`directory and double-click it (or drag it to the Applications folder).
 
 == License
 
 This is supposed to be as free as possible under the https://creativecommons.org/public-domain/cc0/[Creative Commons Zero] (CC0).
 
 image::documentation/cc-zero.svg[CC0]
-

@@ -4,9 +4,11 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"golang.org/x/image/colornames"
 	"image"
+	"image/color"
 	"thisisfyne/internal/app/selfie"
 )
 
@@ -74,8 +76,14 @@ func (li *SelfieTreeItem) CreateRenderer() fyne.WidgetRenderer {
 	li.imageUI = canvasImg
 	li.statusUI = statusIcon
 
-	c := container.NewBorder(nil, canvasText, canvasImg, statusIcon)
-	c = container.NewPadded(c)
+	bg := canvas.NewRectangle(color.RGBA{R: 128, G: 128, B: 128, A: 24})
+	bg.CornerRadius = theme.SelectionRadiusSize()
+	bg.StrokeColor = color.RGBA{R: 128, G: 128, B: 128, A: 32}
+	bg.StrokeWidth = 1.5
+
+	c := container.NewBorder(nil, canvasText, statusIcon, canvasImg)
+	c = container.NewPadded(container.NewPadded(c))
+	c = container.NewStack(bg, c)
 
 	return widget.NewSimpleRenderer(c)
 }

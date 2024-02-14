@@ -17,6 +17,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"thisisfyne/internal/app/resources"
 	"thisisfyne/internal/app/selfie"
 	w "thisisfyne/internal/pkg/widget"
 )
@@ -38,13 +39,14 @@ func main() {
 
 	toolbarWidget := toolbar(window)
 
+	// Make an initial attempt to load images from "default" subdirectory.
 	imageFiles, err := selfie.LoadImageFiles("images/selfies")
 	if err != nil {
 		log.Println("Could not preload images from 'images/selfies', use 'open directory' to load images manually.")
 	}
 	selfies = selfie.ConvertToSelfieSets(imageFiles)
 
-	selfieSelectionListWidget = selfieSetWidgetList()
+	selfieSelectionListWidget = selfieSetSelectionListWidget()
 
 	mainLayout := container.NewBorder(toolbarWidget, nil, selfieSelectionListWidget, nil, mainArea)
 	updateMainArea()
@@ -54,18 +56,18 @@ func main() {
 	window.ShowAndRun()
 }
 
-func selfieSetWidgetList() *widget.List {
+func selfieSetSelectionListWidget() *widget.List {
 	imageList := widget.NewList(
 		func() int {
 			return len(selfies)
 		},
 		func() fyne.CanvasObject {
-			fmt.Println("Create")
+			// fmt.Println("Create")
 			labelledImage := w.NewSelfieTreeItem(nil, 150)
 			return labelledImage
 		},
 		func(i widget.ListItemID, o fyne.CanvasObject) {
-			fmt.Printf("Update %d: %s\n", i, selfies[i].Name)
+			// fmt.Printf("Update %d: %s\n", i, selfies[i].Name)
 			o.(*w.SelfieTreeItem).SetSelfies(selfies[i])
 		})
 
@@ -76,7 +78,7 @@ func selfieSetWidgetList() *widget.List {
 	}
 
 	imageList.OnUnselected = func(i widget.ListItemID) {
-		fmt.Printf("Unselected %d: %s\n", i, selfies[i].Name)
+		// fmt.Printf("Unselected %d: %s\n", i, selfies[i].Name)
 	}
 
 	return imageList
@@ -132,7 +134,7 @@ func setMainAreaSelfies(selfies *selfie.SelfieSet) {
 func setPrimaryAreaEmpty() {
 	mainArea.RemoveAll()
 
-	mainImage := canvas.NewImageFromFile("documentation/this_is_fyne.jpg")
+	mainImage := canvas.NewImageFromResource(resources.ThisIsFyneImageResource)
 	mainImage.ScaleMode = canvas.ImageScaleSmooth
 	mainImage.FillMode = canvas.ImageFillOriginal
 
