@@ -224,28 +224,10 @@ func keyTypeHandler() func(event *fyne.KeyEvent) {
 			selectNextSelfies()
 
 		case fyne.KeyLeft:
-			if secondaryAreaScroll != nil {
-				dx := float32(300) / 3
-				scrollableSelfiesContainer := secondaryAreaScroll.Content.(*fyne.Container)
-				amountScrollableSelfies := len(scrollableSelfiesContainer.Objects)
-				if amountScrollableSelfies > 0 {
-					containerMinWidth := scrollableSelfiesContainer.MinSize().Width
-					dx = containerMinWidth / (float32(amountScrollableSelfies) * 3)
-				}
-				secondaryAreaScroll.Scrolled(&fyne.ScrollEvent{Scrolled: fyne.Delta{DX: dx, DY: 0}})
-			}
+			scrollSelfies(1)
 
 		case fyne.KeyRight:
-			if secondaryAreaScroll != nil {
-				dx := float32(300) / 3
-				scrollableSelfiesContainer := secondaryAreaScroll.Content.(*fyne.Container)
-				amountScrollableSelfies := len(scrollableSelfiesContainer.Objects)
-				if amountScrollableSelfies > 0 {
-					containerMinWidth := scrollableSelfiesContainer.MinSize().Width
-					dx = containerMinWidth / (float32(amountScrollableSelfies) * 3)
-				}
-				secondaryAreaScroll.Scrolled(&fyne.ScrollEvent{Scrolled: fyne.Delta{DX: -dx, DY: 0}})
-			}
+			scrollSelfies(-1)
 
 		case fyne.Key1:
 			if currentSelectedSelfieIndex != -1 {
@@ -275,6 +257,33 @@ func keyTypeHandler() func(event *fyne.KeyEvent) {
 				mainArea.Refresh()
 			}
 		}
+	}
+}
+
+func scrollSelfies(direction int) {
+	if secondaryAreaScroll != nil {
+		dx := float32(300) / 3 // Default value, scroll 1/3 of 300 pixels (300 pixels are supposed selfie image width)
+
+		scrollableSelfiesContainer := secondaryAreaScroll.Content.(*fyne.Container)
+		amountScrollableSelfies := len(scrollableSelfiesContainer.Objects)
+		if amountScrollableSelfies > 0 {
+			containerMinWidth := scrollableSelfiesContainer.MinSize().Width        // Min width of container with al scrollable selfies
+			selfieMinWidth := containerMinWidth / float32(amountScrollableSelfies) // Actual selfie image (mean) min width in container
+			dx = selfieMinWidth / 3                                                // Scroll 1/3 of an image min width
+		}
+
+		// Make a smooth scroll
+		animationLastValue := float32(0)
+		animation := fyne.NewAnimation(canvas.DurationShort, func(f float32) {
+			animationDeltaProgress := f - animationLastValue
+			secondaryAreaScroll.Scrolled(&fyne.ScrollEvent{Scrolled: fyne.Delta{DX: float32(direction) * dx * animationDeltaProgress, DY: 0}})
+			animationLastValue = f
+		})
+		animation.Curve = fyne.AnimationEaseInOut
+		animation.Start()
+
+		// Make quick scroll (rather jump) in scroll pane
+		// secondaryAreaScroll.Scrolled(&fyne.ScrollEvent{Scrolled: fyne.Delta{DX: dx, DY: 0}})
 	}
 }
 
