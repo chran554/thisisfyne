@@ -4,6 +4,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"log"
 	"thisisfyne/internal/app/selfie"
 )
 
@@ -42,6 +43,12 @@ func (li *StatusSelectButtons) CreateRenderer() fyne.WidgetRenderer {
 	c := container.NewGridWithColumns(4, li.buttonNotHandled, li.buttonOk, li.buttonSuspicious, li.buttonFake)
 
 	return widget.NewSimpleRenderer(c)
+}
+
+func (li *StatusSelectButtons) Refresh() {
+	log.Println("Refresh of select buttons")
+	li.updateButtonStates()
+	li.BaseWidget.Refresh()
 }
 
 func (li *StatusSelectButtons) changeStatus(status selfie.SelfieSetStatus) {

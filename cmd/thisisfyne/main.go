@@ -22,12 +22,15 @@ import (
 	w "thisisfyne/internal/pkg/widget"
 )
 
+var currentSelectedSelfieIndex int
 var currentSelfieSet *selfie.SelfieSet
 var selfies []*selfie.SelfieSet
 var mainArea *fyne.Container
-var selfieSelectionListWidget *widget.List
+var selfieSelectionListWidget *w.SelectionList
+var secondaryAreaScroll *container.Scroll
 
 func init() {
+	currentSelectedSelfieIndex = -1
 	mainArea = container.New(layout.NewStackLayout())
 }
 
@@ -36,6 +39,8 @@ func main() {
 	application.SetIcon(theme.ComputerIcon())
 
 	window := application.NewWindow("This is fyne")
+
+	window.Canvas().SetOnTypedKey(keyTypeHandler())
 
 	toolbarWidget := toolbar(window)
 
@@ -56,8 +61,8 @@ func main() {
 	window.ShowAndRun()
 }
 
-func selfieSetSelectionListWidget() *widget.List {
-	imageList := widget.NewList(
+func selfieSetSelectionListWidget() *w.SelectionList {
+	imageList := w.NewSelectionList(
 		func() int {
 			return len(selfies)
 		},
@@ -121,7 +126,7 @@ func setMainAreaSelfies(selfies *selfie.SelfieSet) {
 			secondaryArea.Add(secondaryInfoImage)
 		}
 
-		secondaryAreaScroll := container.NewHScroll(secondaryArea)
+		secondaryAreaScroll = container.NewHScroll(secondaryArea)
 
 		area := container.NewBorder(nil, nil, primaryArea, nil, secondaryAreaScroll)
 
@@ -144,15 +149,11 @@ func setPrimaryAreaEmpty() {
 
 func toolbar(parent fyne.Window) *widget.Toolbar {
 	toolbarWidget := widget.NewToolbar(
-		widget.NewToolbarAction(theme.FolderOpenIcon(), func() {
-			loadSelfies(parent)
-		}),
-		widget.NewToolbarAction(theme.DownloadIcon(), func() {
-			exportSelfiesStatus(parent)
-		}),
+		widget.NewToolbarAction(theme.FolderOpenIcon(), func() { loadSelfies(parent) }),
+		widget.NewToolbarAction(theme.DownloadIcon(), func() { exportSelfiesStatus(parent) }),
 		widget.NewToolbarSeparator(),
-		widget.NewToolbarAction(theme.MoveUpIcon(), func() {}),
-		widget.NewToolbarAction(theme.MoveDownIcon(), func() {}),
+		widget.NewToolbarAction(theme.MoveUpIcon(), func() { selectPreviousSelfies() }),
+		widget.NewToolbarAction(theme.MoveDownIcon(), func() { selectNextSelfies() }),
 		widget.NewToolbarSpacer(),
 		widget.NewToolbarAction(theme.HelpIcon(), func() {
 			log.Println("Display help")
@@ -183,9 +184,9 @@ func loadSelfies(parent fyne.Window) {
 		log.Fatal(err) //print the error if obtained
 	}
 
-	mfileURI := storage.NewFileURI(directory)
-	mfileLister, _ := storage.ListerForURI(mfileURI)
-	folderOpenDialog.SetLocation(mfileLister)
+	fileDialogURI := storage.NewFileURI(directory)
+	fileDialogLister, _ := storage.ListerForURI(fileDialogURI)
+	folderOpenDialog.SetLocation(fileDialogLister)
 
 	folderOpenDialog.Show()
 }
@@ -208,5 +209,95 @@ func exportSelfiesStatus(parent fyne.Window) {
 	fileSaveDialog.Show()
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func keyTypeHandler() func(event *fyne.KeyEvent) {
+	return func(event *fyne.KeyEvent) {
+		switch event.Name {
+		case fyne.KeyUp:
+			log.Printf("Caught the key '%s'\n", event.Name)
+			selectPreviousSelfies()
+
+		case fyne.KeyDown:
+			log.Printf("Caught the key '%s'\n", event.Name)
+			selectNextSelfies()
+
+		case fyne.KeyLeft:
+			if secondaryAreaScroll != nil {
+				dx := float32(300) / 3
+				scrollableSelfiesContainer := secondaryAreaScroll.Content.(*fyne.Container)
+				amountScrollableSelfies := len(scrollableSelfiesContainer.Objects)
+				if amountScrollableSelfies > 0 {
+					containerMinWidth := scrollableSelfiesContainer.MinSize().Width
+					dx = containerMinWidth / (float32(amountScrollableSelfies) * 3)
+				}
+				secondaryAreaScroll.Scrolled(&fyne.ScrollEvent{Scrolled: fyne.Delta{DX: dx, DY: 0}})
+			}
+
+		case fyne.KeyRight:
+			if secondaryAreaScroll != nil {
+				dx := float32(300) / 3
+				scrollableSelfiesContainer := secondaryAreaScroll.Content.(*fyne.Container)
+				amountScrollableSelfies := len(scrollableSelfiesContainer.Objects)
+				if amountScrollableSelfies > 0 {
+					containerMinWidth := scrollableSelfiesContainer.MinSize().Width
+					dx = containerMinWidth / (float32(amountScrollableSelfies) * 3)
+				}
+				secondaryAreaScroll.Scrolled(&fyne.ScrollEvent{Scrolled: fyne.Delta{DX: -dx, DY: 0}})
+			}
+
+		case fyne.Key1:
+			if currentSelectedSelfieIndex != -1 {
+				selfies[currentSelectedSelfieIndex].Status = selfie.SelfieSetStatusNotHandled
+				selfieSelectionListWidget.Refresh()
+				mainArea.Refresh()
+			}
+
+		case fyne.Key2:
+			if currentSelectedSelfieIndex != -1 {
+				selfies[currentSelectedSelfieIndex].Status = selfie.SelfieSetStatusOk
+				selfieSelectionListWidget.Refresh()
+				mainArea.Refresh()
+			}
+
+		case fyne.Key3:
+			if currentSelectedSelfieIndex != -1 {
+				selfies[currentSelectedSelfieIndex].Status = selfie.SelfieSetStatusSuspicious
+				selfieSelectionListWidget.Refresh()
+				mainArea.Refresh()
+			}
+
+		case fyne.Key4:
+			if currentSelectedSelfieIndex != -1 {
+				selfies[currentSelectedSelfieIndex].Status = selfie.SelfieSetStatusFake
+				selfieSelectionListWidget.Refresh()
+				mainArea.Refresh()
+			}
+		}
+	}
+}
+
+func selectNextSelfies() {
+	if currentSelectedSelfieIndex == -1 && len(selfies) > 0 {
+		currentSelectedSelfieIndex = 0
+		selfieSelectionListWidget.Select(currentSelectedSelfieIndex)
+	} else if currentSelectedSelfieIndex >= 0 && currentSelectedSelfieIndex < len(selfies)-1 {
+		selfieSelectionListWidget.Unselect(currentSelectedSelfieIndex)
+		currentSelectedSelfieIndex++
+		currentSelectedSelfieIndex = min(len(selfies)-1, currentSelectedSelfieIndex)
+		selfieSelectionListWidget.Select(currentSelectedSelfieIndex)
+	}
+}
+
+func selectPreviousSelfies() {
+	if currentSelectedSelfieIndex == -1 && len(selfies) > 0 {
+		currentSelectedSelfieIndex = len(selfies) - 1
+		selfieSelectionListWidget.Select(currentSelectedSelfieIndex)
+	} else if currentSelectedSelfieIndex > 0 && currentSelectedSelfieIndex < len(selfies) {
+		selfieSelectionListWidget.Unselect(currentSelectedSelfieIndex)
+		currentSelectedSelfieIndex--
+		currentSelectedSelfieIndex = max(0, currentSelectedSelfieIndex)
+		selfieSelectionListWidget.Select(currentSelectedSelfieIndex)
 	}
 }
