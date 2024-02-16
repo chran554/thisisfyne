@@ -16,7 +16,10 @@ This project is developed using macOS and Makefile as build tool.
 
 If you are using another OS and not using Makefile, you can most likely find out how to build the application by inspecting the `Makefile` and issue the commands manually.
 
-* Install go (duh!)
+=== Install go and Fyne
+
+* Install go (duh!) +
+  Use https://formulae.brew.sh/formula/go[brew] or use go https://go.dev/doc/install[download and install]
 * Install Fyne dependencies. +
   Read the full getting started docs at the https://fyne.io/[fyne site]. +
   Basically it is: +
@@ -33,7 +36,13 @@ If you are using another OS and not using Makefile, you can most likely find out
     # ### Finish by making sure all things are neat and tidy
     $ go mod tidy
 ----
+
+=== Build
+
 * Build with: `make all`
+
+=== Run
+
 * Run with: `./bin/thisisfyne` after build
 
 === Build MacOS app
