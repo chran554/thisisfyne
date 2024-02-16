@@ -10,6 +10,24 @@ image::documentation/this_is_fyne.jpg[This is fyne]
 .This is a screenshot of my very fyne test application
 image::documentation/screenshot.png[This is fyne - screenshot]
 
+== Functionality
+
+First of all, I never intended this application to be useful or solve any problem or use case in any way.
+I just felt I needed some idea of a image-based program to aim for when trying out Fyne.
+
+The application can open a directory with jpg-images with names on the format `selfieXX_YY.jpg`. Where `XX` is a number, `selfieXX` is the name of the set of selfie images and `YY` is a number for each selfie in the selfie set. +
+A bunch of test images can be found under `images/selfies`.
+
+You can assign a status to each set of selfies ("not handled", "ok", "suspicious" and "fake").
+
+The application can export a json-report on the selfie sets and their given status.
+
+To efficiently navigate the application using keyboard:
+
+. You can scroll through the list of selfie sets by `↑` (up) and `↓` (down) keys.
+. You can scroll through selfies in a selfie set by using the `←` (left) and `→` (right) keys.
+. You can set status for a selfie set by using keys `1`, `2` , `3` and `4`.
+
 == Build and run application
 
 This project is developed using macOS and Makefile as build tool.
