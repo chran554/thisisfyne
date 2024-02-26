@@ -4,70 +4,65 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"log"
 	"thisisfyne/internal/app/selfie"
 )
 
-type StatusSelectButtons struct {
+type SelfieSetStatusButtons struct {
 	widget.BaseWidget
 
-	Status     selfie.SelfieSetStatus
-	onChangeFn func(status selfie.SelfieSetStatus)
+	status selfie.SelfieSetStatus
 
-	// private UI components
+	tapped func(status selfie.SelfieSetStatus)
+
 	buttonNotHandled *widget.Button
 	buttonOk         *widget.Button
 	buttonSuspicious *widget.Button
 	buttonFake       *widget.Button
 }
 
-func NewStatusSelectButtons(status selfie.SelfieSetStatus, onChangeFn func(status selfie.SelfieSetStatus)) *StatusSelectButtons {
-	statusSelectButtons := &StatusSelectButtons{Status: status, onChangeFn: onChangeFn}
+func NewSelfieSetStatusButtons(tapped func(status selfie.SelfieSetStatus)) *SelfieSetStatusButtons {
+	statusSelectButtons := &SelfieSetStatusButtons{tapped: tapped}
+
 	statusSelectButtons.ExtendBaseWidget(statusSelectButtons)
 
 	return statusSelectButtons
 }
 
-//func (li *LabelledImage) Tapped(*fyne.PointEvent) {
-//	log.Printf("Clicked labelled image '%s'", li.Text)
-//}
+func (b *SelfieSetStatusButtons) CreateRenderer() fyne.WidgetRenderer {
+	b.buttonNotHandled = widget.NewButton("", func() { b.setSelfieSetStatus(selfie.SelfieSetStatusNotHandled) })
+	b.buttonOk = widget.NewButton("", func() { b.setSelfieSetStatus(selfie.SelfieSetStatusOk) })
+	b.buttonSuspicious = widget.NewButton("", func() { b.setSelfieSetStatus(selfie.SelfieSetStatusSuspicious) })
+	b.buttonFake = widget.NewButton("", func() { b.setSelfieSetStatus(selfie.SelfieSetStatusFake) })
 
-func (li *StatusSelectButtons) CreateRenderer() fyne.WidgetRenderer {
-	li.buttonNotHandled = widget.NewButton("", func() { li.changeStatus(selfie.SelfieSetStatusNotHandled) })
-	li.buttonOk = widget.NewButton("", func() { li.changeStatus(selfie.SelfieSetStatusOk) })
-	li.buttonSuspicious = widget.NewButton("", func() { li.changeStatus(selfie.SelfieSetStatusSuspicious) })
-	li.buttonFake = widget.NewButton("", func() { li.changeStatus(selfie.SelfieSetStatusFake) })
+	b.updateUI()
 
-	li.updateButtonStates()
-
-	c := container.NewGridWithColumns(4, li.buttonNotHandled, li.buttonOk, li.buttonSuspicious, li.buttonFake)
+	c := container.NewGridWithColumns(4, b.buttonNotHandled, b.buttonOk, b.buttonSuspicious, b.buttonFake)
 
 	return widget.NewSimpleRenderer(c)
 }
 
-func (li *StatusSelectButtons) Refresh() {
-	log.Println("Refresh of select buttons")
-	li.updateButtonStates()
-	li.BaseWidget.Refresh()
-}
-
-func (li *StatusSelectButtons) changeStatus(status selfie.SelfieSetStatus) {
-	li.SetStatus(status)
-
-	if li.onChangeFn != nil {
-		li.onChangeFn(status)
+func (b *SelfieSetStatusButtons) setSelfieSetStatus(status selfie.SelfieSetStatus) {
+	b.SetSelfieSetStatus(status)
+	if b.tapped != nil {
+		b.tapped(b.status)
 	}
 }
 
-func (li *StatusSelectButtons) SetStatus(status selfie.SelfieSetStatus) {
-	li.Status = status
-	li.updateButtonStates()
-	li.Refresh()
+func (b *SelfieSetStatusButtons) SetSelfieSetStatus(status selfie.SelfieSetStatus) {
+	b.status = status
+	b.updateUI()
+	b.Refresh()
 }
 
-func (li *StatusSelectButtons) updateButtonStates() {
-	li.buttonNotHandled.Icon, li.buttonNotHandled.Importance, _ = selfie.IconAttributesFromStatus(selfie.SelfieSetStatusNotHandled, li.Status == selfie.SelfieSetStatusNotHandled)
-	li.buttonOk.Icon, li.buttonOk.Importance, _ = selfie.IconAttributesFromStatus(selfie.SelfieSetStatusOk, li.Status == selfie.SelfieSetStatusOk)
-	li.buttonSuspicious.Icon, li.buttonSuspicious.Importance, _ = selfie.IconAttributesFromStatus(selfie.SelfieSetStatusSuspicious, li.Status == selfie.SelfieSetStatusSuspicious)
-	li.buttonFake.Icon, li.buttonFake.Importance, _ = selfie.IconAttributesFromStatus(selfie.SelfieSetStatusFake, li.Status == selfie.SelfieSetStatusFake)
+func (b *SelfieSetStatusButtons) updateUI() {
+	if b.buttonNotHandled != nil {
+		b.buttonNotHandled.Icon, b.buttonNotHandled.Importance, _ = selfie.IconAttributesFromStatus(selfie.SelfieSetStatusNotHandled, b.getStatus() == selfie.SelfieSetStatusNotHandled)
+		b.buttonOk.Icon, b.buttonOk.Importance, _ = selfie.IconAttributesFromStatus(selfie.SelfieSetStatusOk, b.getStatus() == selfie.SelfieSetStatusOk)
+		b.buttonSuspicious.Icon, b.buttonSuspicious.Importance, _ = selfie.IconAttributesFromStatus(selfie.SelfieSetStatusSuspicious, b.getStatus() == selfie.SelfieSetStatusSuspicious)
+		b.buttonFake.Icon, b.buttonFake.Importance, _ = selfie.IconAttributesFromStatus(selfie.SelfieSetStatusFake, b.getStatus() == selfie.SelfieSetStatusFake)
+	}
+}
+
+func (b *SelfieSetStatusButtons) getStatus() selfie.SelfieSetStatus {
+	return b.status
 }

@@ -13,20 +13,18 @@ import (
 type StatusIcon struct {
 	widget.BaseWidget
 
-	Status selfie.SelfieSetStatus
+	status selfie.SelfieSetStatus
 
 	icon       *widget.Icon
 	background *canvas.Rectangle
 }
 
-func NewStatusIcon(status selfie.SelfieSetStatus) *StatusIcon {
-	item := &StatusIcon{
-		Status: status,
-	}
+func NewStatusIcon() *StatusIcon {
+	statusIcon := &StatusIcon{}
 
-	item.ExtendBaseWidget(item)
+	statusIcon.ExtendBaseWidget(statusIcon)
 
-	return item
+	return statusIcon
 }
 
 func (item *StatusIcon) CreateRenderer() fyne.WidgetRenderer {
@@ -38,17 +36,18 @@ func (item *StatusIcon) CreateRenderer() fyne.WidgetRenderer {
 	item.updateUI()
 
 	c := container.NewStack(item.background, container.NewPadded(item.icon))
+
 	return widget.NewSimpleRenderer(c)
 }
 
-func (item *StatusIcon) SetStatus(status selfie.SelfieSetStatus) {
-	item.Status = status
+func (item *StatusIcon) SetSelfieSetStatus(status selfie.SelfieSetStatus) {
+	item.status = status
 	item.updateUI()
 	item.Refresh()
 }
 
 func (item *StatusIcon) updateUI() {
-	iconResource, _, c := selfie.IconAttributesFromStatus(item.Status, true)
+	iconResource, _, c := selfie.IconAttributesFromStatus(item.status, true)
 	item.icon.Resource = iconResource
 	item.background.FillColor = c
 }

@@ -1,6 +1,7 @@
 package selfie
 
 import (
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -8,6 +9,17 @@ import (
 	"regexp"
 	"sort"
 )
+
+type SelfieSet struct {
+	Name            string          `json:"name"`
+	PrimaryImage    *ImageFile      `json:"primary_image"`
+	SecondaryImages []*ImageFile    `json:"secondary_images"`
+	Status          SelfieSetStatus `json:"status"`
+}
+
+func (s *SelfieSet) String() string {
+	return fmt.Sprintf("%s [%s]", s.Name, s.Status)
+}
 
 type SelfieSetStatus string
 
@@ -48,13 +60,6 @@ func IconAttributesFromStatus(status SelfieSetStatus, active bool) (fyne.Resourc
 	}
 
 	return iconResource, importance, c
-}
-
-type SelfieSet struct {
-	Name            string          `json:"name"`
-	PrimaryImage    *ImageFile      `json:"primary_image"`
-	SecondaryImages []*ImageFile    `json:"secondary_images"`
-	Status          SelfieSetStatus `json:"status"`
 }
 
 func ConvertToSelfieSets(imageFiles []*ImageFile) []*SelfieSet {

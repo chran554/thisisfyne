@@ -54,10 +54,6 @@ func NewInfoImage(image *image.Image, size int, text1, text2, text3, text4, text
 	return infoImage
 }
 
-//func (li *LabelledImage) Tapped(*fyne.PointEvent) {
-//	log.Printf("Clicked labelled image '%s'", li.Text)
-//}
-
 func (li *InfoImage) CreateRenderer() fyne.WidgetRenderer {
 	text1 := infoText(li.Text1, colornames.Gray, 10)
 	text2 := infoText(li.Text2, colornames.Gray, 10)
@@ -104,7 +100,8 @@ func infoText(text string, color color.RGBA, size int) *canvas.Text {
 
 func (li *InfoImage) SetImage(img *image.Image) {
 	li.Image = img
-	li.imageUI.Image = *img
+
+	li.updateUI()
 	li.Refresh()
 }
 
@@ -116,12 +113,17 @@ func (li *InfoImage) SetText(text1, text2, text3, text4, text5, text6 string) {
 	li.Text5 = text5
 	li.Text6 = text6
 
-	li.textUI1.Text = text1
-	li.textUI2.Text = text2
-	li.textUI3.Text = text3
-	li.textUI4.Text = text4
-	li.textUI5.Text = text5
-	li.textUI6.Text = text6
-
+	li.updateUI()
 	li.Refresh()
+}
+
+func (li *InfoImage) updateUI() {
+	li.textUI1.Text = li.Text1
+	li.textUI2.Text = li.Text2
+	li.textUI3.Text = li.Text3
+	li.textUI4.Text = li.Text4
+	li.textUI5.Text = li.Text5
+	li.textUI6.Text = li.Text6
+
+	li.imageUI.Image = *li.Image
 }
