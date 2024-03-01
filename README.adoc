@@ -63,12 +63,24 @@ If you are using another OS and not using Makefile, you can most likely find out
 
 * Run with: `./bin/thisisfyne` after build
 
-=== Build MacOS app
+=== Build macOS app
 
-You can use Fyne to build a MacOS application (with application icon).
+This application is developed on the macOS and has a make target to build a macOS app using fyne command on native platform.
+You can use Fyne to build a MacOS application (with macOS application icon).
 
 * Build with `make macos-app`
 * Look for the application (using Finder) in `./bin`directory and double-click it (or drag it to the Applications folder).
+
+== Cross compile for other platforms
+
+You need to install fyne-cross (as described on their https://docs.fyne.io/started/cross-compiling.html[webbpage]).
+Basically it is just: +
+[source,bash]
+----
+go install github.com/fyne-io/fyne-cross@latest
+----
+
+* Build with `make cross-app <plattform>`
 
 == License
 
